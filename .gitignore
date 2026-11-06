@@ -1,0 +1,22 @@
+# 编译输出固件
+*.bin
+*.hex
+*.elf
+*.map
+Debug/
+Release/
+build/
+firmware/*
+
+# CubeMX临时文件
+*.bak
+*.ioc_backup
+
+# Python缓存
+__pycache__/
+*.pyc
+
+# IDE本地配置
+.vscode/
+.idea/
+*.suo
