@@ -1,22 +1,43 @@
-# 编译输出固件
-*.bin
+# ===== 编译产物（不上传） =====
+firmware/
 *.hex
+*.bin
+*.axf
 *.elf
 *.map
-Debug/
-Release/
-build/
-firmware/*
+*.o
+*.d
+*.crf
+*.lst
 
-# CubeMX临时文件
+# ===== Keil MDK 临时文件 =====
+*.uvguix.*
+*.uvoptx
 *.bak
-*.ioc_backup
+*.dep
+*.scvd
+Objects/
+Listings/
+JLinkLog.txt
+RTE/
 
-# Python缓存
-__pycache__/
-*.pyc
-
-# IDE本地配置
+# ===== 其它 IDE =====
 .vscode/
 .idea/
-*.suo
+*.ioc.bak
+
+# ===== Python =====
+__pycache__/
+*.pyc
+*.pyo
+venv/
+
+# ===== 日志与临时 =====
+*.log
+*.tmp
+*.orig
+*.rej
+
+# ===== 保留空的固件目录结构 =====
+!firmware/**/
+!firmware/.gitkeep
