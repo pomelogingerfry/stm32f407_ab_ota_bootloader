@@ -1,0 +1,25 @@
+--cpu=Cortex-M4.fp.sp --lto
+"boot-loader\startup_stm32f407xx.o"
+"boot-loader\main.o"
+"boot-loader\stm32f4xx_it.o"
+"boot-loader\stm32f4xx_hal_msp.o"
+"boot-loader\stm32f4xx_hal_uart.o"
+"boot-loader\stm32f4xx_hal_rcc.o"
+"boot-loader\stm32f4xx_hal_rcc_ex.o"
+"boot-loader\stm32f4xx_hal_flash.o"
+"boot-loader\stm32f4xx_hal_flash_ex.o"
+"boot-loader\stm32f4xx_hal_flash_ramfunc.o"
+"boot-loader\stm32f4xx_hal_gpio.o"
+"boot-loader\stm32f4xx_hal_dma_ex.o"
+"boot-loader\stm32f4xx_hal_dma.o"
+"boot-loader\stm32f4xx_hal_pwr.o"
+"boot-loader\stm32f4xx_hal_pwr_ex.o"
+"boot-loader\stm32f4xx_hal_cortex.o"
+"boot-loader\stm32f4xx_hal.o"
+"boot-loader\stm32f4xx_hal_exti.o"
+"boot-loader\system_stm32f4xx.o"
+"boot-loader\boot_jump.o"
+--strict --scatter "..\..\LD\bootloader.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\BOOT-LOADER.map" -o BOOT-LOADER\BOOT-LOADER.axf

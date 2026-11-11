@@ -1,5 +1,5 @@
-#ifndef __APP_PARTITION_H
-#define __APP_PARTITION_H
+#ifndef __FLASH_PARTITION_H
+#define __FLASH_PARTITION_H
 #include "stdint.h"
 
 #define BOOT_BASE        0x08000000UL
