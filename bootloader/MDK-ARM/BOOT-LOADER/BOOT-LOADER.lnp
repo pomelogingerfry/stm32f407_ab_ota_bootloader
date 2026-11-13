@@ -18,9 +18,9 @@
 "boot-loader\stm32f4xx_hal.o"
 "boot-loader\stm32f4xx_hal_exti.o"
 "boot-loader\system_stm32f4xx.o"
-"boot-loader\boot_jump.o"
 "boot-loader\flash_driver.o"
---strict --scatter "..\..\LD\bootloader.sct"
+"boot-loader\boot_jump.o"
+--strict --scatter "..\bootloader.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
 --list ".\BOOT-LOADER.map" -o BOOT-LOADER\BOOT-LOADER.axf

@@ -341,7 +341,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F407xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;.\JUMP;..\..\..\falsh_parttion;..\Core\Inc;..\..\..\falsh_parttion</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;.\JUMP;..\Core\Inc;..\..\falsh_parttion</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -372,7 +372,7 @@
             <TextAddressRange></TextAddressRange>
             <DataAddressRange></DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>..\..\LD\bootloader.sct</ScatterFile>
+            <ScatterFile>..\bootloader.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -498,17 +498,12 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>JUMP</GroupName>
+          <GroupName>FlashPartition</GroupName>
           <Files>
             <File>
-              <FileName>boot_jump.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\JUMP\boot_jump.c</FilePath>
-            </File>
-            <File>
-              <FileName>boot_jump.h</FileName>
+              <FileName>flash_partition.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\JUMP\boot_jump.h</FilePath>
+              <FilePath>..\..\falsh_parttion\flash_partition.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -528,12 +523,17 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>FlashPartition</GroupName>
+          <GroupName>JUMP</GroupName>
           <Files>
             <File>
-              <FileName>flash_partition.h</FileName>
+              <FileName>boot_jump.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\JUMP\boot_jump.c</FilePath>
+            </File>
+            <File>
+              <FileName>boot_jump.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\falsh_parttion\flash_partition.h</FilePath>
+              <FilePath>.\JUMP\boot_jump.h</FilePath>
             </File>
           </Files>
         </Group>
