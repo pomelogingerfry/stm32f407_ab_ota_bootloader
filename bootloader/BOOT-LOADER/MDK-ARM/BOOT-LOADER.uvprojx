@@ -341,7 +341,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F407xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;.\JUMP;..\..\..\falsh_parttion;..\Core\Inc</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;.\JUMP;..\..\..\falsh_parttion;..\Core\Inc;..\..\..\falsh_parttion</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -504,6 +504,36 @@
               <FileName>boot_jump.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\JUMP\boot_jump.c</FilePath>
+            </File>
+            <File>
+              <FileName>boot_jump.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\JUMP\boot_jump.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>FlashDriver</GroupName>
+          <Files>
+            <File>
+              <FileName>flash_driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\FLASH_DRIVER\flash_driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>flash_driver.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\FLASH_DRIVER\flash_driver.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>FlashPartition</GroupName>
+          <Files>
+            <File>
+              <FileName>flash_partition.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\falsh_parttion\flash_partition.h</FilePath>
             </File>
           </Files>
         </Group>
