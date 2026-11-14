@@ -1,8 +1,0 @@
--xc -std=gnu11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c
--fno-rtti -flto -funsigned-char -fshort-enums -fshort-wchar
--gdwarf-4 -O0 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier -I ../Core/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ./JUMP -I ../Core/Inc -I ../../falsh_parttion
--I./RTE/_BOOT-LOADER
--IC:/Users/w11/AppData/Local/Arm/Packs/ARM/CMSIS/6.1.0/CMSIS/Core/Include
--IC:/Users/w11/AppData/Local/Arm/Packs/Keil/STM32F4xx_DFP/2.7.0/Drivers/CMSIS/Device/ST/STM32F4xx/Include
--D__UVISION_VERSION="541" -DSTM32F407xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F407xx
--o boot-loader/flash_driver.o -MMD "FLASH_DRIVER/flash_driver.c"

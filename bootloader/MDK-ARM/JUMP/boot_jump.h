@@ -1,12 +1,18 @@
-#ifndef __BOOT_JUMP_A
-#define __BOOT_JUMP_A
+#ifndef _BOOT_JUMP_H
+#define _BOOT_JUMP_H
 
-#include "stdio.h"
+#include "stm32f4xx_hal.h"
 
 #include "flash_partition.h"
 
-uint8_t App_IsValid(uint32_t app_addr);
+typedef enum
+{
+    JUMP_OK=0,
+    JUMP_ERR_SP_INVALID=1,
+    JUMP_ERR_PC_THUMB=2,
+    JUMP_ERR_PC_OUT_RANGE=3
+}BOOT_JUMP_RET;
 
-void Jump_ToApp(uint32_t app_addr);
+BOOT_JUMP_RET Boot_jump_Exec(uint32_t slot_base);
 
 #endif

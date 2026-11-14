@@ -22,15 +22,26 @@ Dialog DLL:      TCM.DLL V1.56.4.0
  
 <h2>Project:</h2>
 c:\Users\w11\Desktop\f4-ota-bootloader\bootloader\MDK-ARM\BOOT-LOADER.uvprojx
-Project File Date:  11/13/2026
+Project File Date:  11/14/2026
 
 <h2>Output:</h2>
 *** Using Compiler 'V6.22', folder: 'C:\Users\w11\AppData\Local\Keil_v5\ARM\ARMCLANG\Bin'
 Build target 'BOOT-LOADER'
+../Core/Src/main.c(120): warning: incompatible pointer types passing 'uint32_t[2]' (aka 'unsigned int[2]') to parameter of type 'uint8_t *' (aka 'unsigned char *') [-Wincompatible-pointer-types]
+  120 | Flash_Write(TEST_ADDR, write_buf, sizeof(write_buf), &next_offset);
+      |                        ^~~~~~~~~
+./FLASH_DRIVER\flash_driver.h(22): note: passing argument to parameter 'data_buf' here
+   22 | FLASH_STATUS_TYPE Flash_Write(uint32_t dest_addr,uint8_t *data_buf,
+      |                                                           ^
+1 warning generated.
+compiling main.c...
+linking...
+Program Size: Code=12582 RO-data=682 RW-data=44 ZI-data=1108  
+FromELF: creating hex file...
 After Build - User command #1: fromelf --bin --output ..\..\firmware\bootloader\bootloader.bin .\Objects\bootloader.axf
 ".\Objects\bootloader.axf": Error: Q0122E: Could not open file '.\Objects\bootloader.axf': No such file or directory
 Finished: 0 information, 0 warning and 1 error messages.
-"BOOT-LOADER\BOOT-LOADER.axf" - 0 Error(s), 0 Warning(s).
+".\BOOT-LOADER\BOOT-LOADER.axf" - 0 Error(s), 1 Warning(s).
 
 <h2>Software Packages used:</h2>
 

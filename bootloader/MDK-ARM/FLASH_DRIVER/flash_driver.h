@@ -1,7 +1,7 @@
 #ifndef _FLASH_DRIVER_H
 #define _FLASH_DRIVER_H
 #define FLASH_START_ADDR 0x08000000U
-#define FLASH_END_ADDR 0x080E0000U
+#define FLASH_END_ADDR 0x08100000U
 
 #include "flash_partition.h"
 #include "stm32f4xx_hal.h"
@@ -15,7 +15,7 @@ typedef enum{
     FLASH_ERR_NOT_BLANK=5
 }FLASH_STATUS_TYPE;
 
-FLASH_STATUS_TYPE Flash_GetSecotor(uint32_t addr);
+uint32_t Flash_GetSector(uint32_t addr);
 
 FLASH_STATUS_TYPE Flash_EraseSector(uint32_t sector_addr);
 

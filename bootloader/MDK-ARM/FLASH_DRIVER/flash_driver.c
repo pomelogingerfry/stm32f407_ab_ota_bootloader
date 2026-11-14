@@ -1,5 +1,5 @@
 #include "flash_driver.h"
-FLASH_STATUS_TYPE Flash_GetSecotor(uint32_t addr)
+uint32_t Flash_GetSector(uint32_t addr)
 {
     if(addr>=0x08000000U&&addr<=0x08004000U)return FLASH_SECTOR_0;
     if(addr>=0x08004000U&&addr<=0x08008000U)return FLASH_SECTOR_1;
@@ -12,7 +12,7 @@ FLASH_STATUS_TYPE Flash_GetSecotor(uint32_t addr)
     if(addr>=0x08080000U&&addr<=0x080A0000U)return FLASH_SECTOR_8;
     if(addr>=0x080A0000U&&addr<=0x080C0000U)return FLASH_SECTOR_9;
     if(addr>=0x080C0000U&&addr<=0x080E0000U)return FLASH_SECTOR_10;
-    if(addr>=0x080E0000U&&addr<=0x080F0000U)return FLASH_SECTOR_11;
+    if(addr>=0x080E0000U&&addr<=0x08100000U)return FLASH_SECTOR_11;
     return 0xFFFFFFFFU;
 }
 FLASH_STATUS_TYPE Flash_EraseSector(uint32_t addr)
@@ -25,8 +25,8 @@ FLASH_STATUS_TYPE Flash_EraseSector(uint32_t addr)
     {
         return FLASH_ERR_ADDR;
     }
-    uint32_t sector_num=Flash_GetSecotor(addr);
-    if(sector_num=0xFFFFFFFFU)
+    uint32_t sector_num=Flash_GetSector(addr);
+    if(sector_num==0xFFFFFFFFU)
     {
         return FLASH_ERR_ADDR;
     }
@@ -57,10 +57,7 @@ uint32_t len_byte,uint32_t *next_wr_addr)
     {
         return FLASH_ERR_ADDR;
     }
-    if(len_byte%4U!=0U)
-    {
-        return FLASH_ERR_ADDR;
-    }
+
     if(len_byte==0U)
     {
         *next_wr_addr=dest_addr;
@@ -69,7 +66,7 @@ uint32_t len_byte,uint32_t *next_wr_addr)
     HAL_FLASH_Unlock();
     uint32_t full_word_len=len_byte/4U;
     uint32_t rest_bytes=len_byte%4U;
-    uint32_t *src_word=(volatile uint32_t *)buf;
+    volatile uint32_t *src_word=(volatile uint32_t *)buf;
     FLASH_STATUS_TYPE status=FLASH_OK;
     uint32_t wrote_bytes=0U;
     for(uint32_t i=0U;i<full_word_len;i++)

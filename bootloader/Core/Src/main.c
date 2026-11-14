@@ -18,6 +18,17 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "stdio.h"
+#include "flash_driver.h"
+
+extern UART_HandleTypeDef huart3;
+
+int fputc(int ch,FILE *f)
+{
+  HAL_UART_Transmit(&huart3,(uint8_t*)&ch,1,0xFFFF);
+  return ch;
+}
+
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -67,6 +78,10 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
+#define TEST_ADDR FAULT_BASE
+uint32_t write_buf[]={0x11223344,0x55667788};
+uint32_t read_buf[2];
+uint32_t next_offset;
 
   /* USER CODE END 1 */
 
@@ -89,8 +104,33 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART3_UART_Init();
-  /* USER CODE BEGIN 2 */
 
+  /* USER CODE BEGIN 2 */
+printf("\r\n==== Flash Test Start ====\r\n");
+printf("Erase sector...\r\n");
+if(Flash_EraseSector(TEST_ADDR) == 0)
+{
+    printf("Erase OK!\r\n");
+}
+else
+{
+    printf("Erase FAIL!\r\n");
+}
+printf("Start write data\r\n");
+Flash_Write(TEST_ADDR, write_buf, sizeof(write_buf), &next_offset);
+printf("Write done, next write addr: 0x%08X\r\n", next_offset);
+read_buf[0] = *(volatile uint32_t *)(TEST_ADDR);
+read_buf[1] = *(volatile uint32_t *)(TEST_ADDR + 4);
+printf("read[0] = 0x%08X\r\n", read_buf[0]);
+printf("read[1] = 0x%08X\r\n", read_buf[1]);
+if(read_buf[0]==0x11223344 && read_buf[1]==0x55667788)
+{
+    printf("✅ Flash write&read SUCCESS!\r\n");
+}
+else
+{
+    printf("❌ Data mismatch!\r\n");
+}
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -100,6 +140,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+   HAL_Delay(200);
   }
   /* USER CODE END 3 */
 }

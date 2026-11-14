@@ -9,10 +9,9 @@
 #define META_SIZE        (128UL * 1024UL)
 
 #define APP_A_BASE       0x08040000UL
-#define APP_A_SIZE       (256UL * 1024UL)
-
 #define APP_B_BASE       0x08080000UL
-#define APP_B_SIZE       (256UL * 1024UL)
+#define SLOT_SIZE        (256UL * 1024UL)
+
 
 #define FAULT_BASE       0x080C0000UL
 #define FAULT_SIZE       (128UL * 1024UL)
