@@ -1,9 +1,9 @@
-#ifndef _BOOT_JUMP_H
-#define _BOOT_JUMP_H
+#ifndef __BOOT_JUMP_H
+#define __BOOT_JUMP_H
 
 #include "stm32f4xx_hal.h"
-
 #include "flash_partition.h"
+#include "flash_driver.h"
 
 typedef enum
 {
@@ -14,5 +14,18 @@ typedef enum
 }BOOT_JUMP_RET;
 
 BOOT_JUMP_RET Boot_jump_Exec(uint32_t slot_base);
+
+typedef struct 
+{
+    uint32_t magic;
+    uint32_t run_slot;
+    uint32_t update_flag;
+
+}OtaMetaTypeDef __attribute__((aligned(4)));
+
+void Meta_Read(OtaMetaTypeDef *meta);
+void Meta_Write(OtaMetaTypeDef *meta);
+
+BOOT_JUMP_RET Check_App_Valid(uint32_t app_addr);
 
 #endif

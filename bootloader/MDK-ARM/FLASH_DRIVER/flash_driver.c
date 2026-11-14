@@ -1,18 +1,18 @@
 #include "flash_driver.h"
 uint32_t Flash_GetSector(uint32_t addr)
 {
-    if(addr>=0x08000000U&&addr<=0x08004000U)return FLASH_SECTOR_0;
-    if(addr>=0x08004000U&&addr<=0x08008000U)return FLASH_SECTOR_1;
-    if(addr>=0x08008000U&&addr<=0x0800C000U)return FLASH_SECTOR_2;
-    if(addr>=0x0800C000U&&addr<=0x08010000U)return FLASH_SECTOR_3;
-    if(addr>=0x08010000U&&addr<=0x08020000U)return FLASH_SECTOR_4;
-    if(addr>=0x08020000U&&addr<=0x08040000U)return FLASH_SECTOR_5;
-    if(addr>=0x08040000U&&addr<=0x08060000U)return FLASH_SECTOR_6;
-    if(addr>=0x08060000U&&addr<=0x08080000U)return FLASH_SECTOR_7;
-    if(addr>=0x08080000U&&addr<=0x080A0000U)return FLASH_SECTOR_8;
-    if(addr>=0x080A0000U&&addr<=0x080C0000U)return FLASH_SECTOR_9;
-    if(addr>=0x080C0000U&&addr<=0x080E0000U)return FLASH_SECTOR_10;
-    if(addr>=0x080E0000U&&addr<=0x08100000U)return FLASH_SECTOR_11;
+    if(addr>=0x08000000U&&addr<0x08004000U)return FLASH_SECTOR_0;
+    if(addr>=0x08004000U&&addr<0x08008000U)return FLASH_SECTOR_1;
+    if(addr>=0x08008000U&&addr<0x0800C000U)return FLASH_SECTOR_2;
+    if(addr>=0x0800C000U&&addr<0x08010000U)return FLASH_SECTOR_3;
+    if(addr>=0x08010000U&&addr<0x08020000U)return FLASH_SECTOR_4;
+    if(addr>=0x08020000U&&addr<0x08040000U)return FLASH_SECTOR_5;
+    if(addr>=0x08040000U&&addr<0x08060000U)return FLASH_SECTOR_6;
+    if(addr>=0x08060000U&&addr<0x08080000U)return FLASH_SECTOR_7;
+    if(addr>=0x08080000U&&addr<0x080A0000U)return FLASH_SECTOR_8;
+    if(addr>=0x080A0000U&&addr<0x080C0000U)return FLASH_SECTOR_9;
+    if(addr>=0x080C0000U&&addr<0x080E0000U)return FLASH_SECTOR_10;
+    if(addr>=0x080E0000U&&addr<0x08100000U)return FLASH_SECTOR_11;
     return 0xFFFFFFFFU;
 }
 FLASH_STATUS_TYPE Flash_EraseSector(uint32_t addr)
@@ -21,7 +21,7 @@ FLASH_STATUS_TYPE Flash_EraseSector(uint32_t addr)
     {
         return FLASH_ERR_ADDR;
     }
-    if(addr>=BOOT_BASE&&addr<=BOOT_BASE+BOOT_SIZE)
+    if(addr>=BOOT_BASE&&addr<BOOT_BASE+BOOT_SIZE)
     {
         return FLASH_ERR_ADDR;
     }

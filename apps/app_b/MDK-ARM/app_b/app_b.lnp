@@ -18,7 +18,7 @@
 "app_b\stm32f4xx_hal.o"
 "app_b\stm32f4xx_hal_exti.o"
 "app_b\system_stm32f4xx.o"
---strict --scatter "..\..\LD_b\appb.sct"
+--strict --scatter "..\appb.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
---list "app_b.map" -o app_b\app_b.axf
+--list "..\..\..\..\app_b.map" -o app_b\app_b.axf

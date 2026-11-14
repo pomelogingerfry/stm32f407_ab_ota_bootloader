@@ -20,14 +20,7 @@
 #include "main.h"
 #include "stdio.h"
 #include "flash_driver.h"
-
-extern UART_HandleTypeDef huart3;
-
-int fputc(int ch,FILE *f)
-{
-  HAL_UART_Transmit(&huart3,(uint8_t*)&ch,1,0xFFFF);
-  return ch;
-}
+#include "boot_jump.h"
 
 
 /* Private includes ----------------------------------------------------------*/
@@ -54,7 +47,7 @@ int fputc(int ch,FILE *f)
 UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
-
+extern UART_HandleTypeDef huart3;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -62,7 +55,11 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
-
+int fputc(int ch,FILE *f)
+{
+  HAL_UART_Transmit(&huart3,(uint8_t*)&ch,1,0xFFFFU);
+  return ch;
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -78,10 +75,6 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-#define TEST_ADDR FAULT_BASE
-uint32_t write_buf[]={0x11223344,0x55667788};
-uint32_t read_buf[2];
-uint32_t next_offset;
 
   /* USER CODE END 1 */
 
@@ -106,31 +99,70 @@ uint32_t next_offset;
   MX_USART3_UART_Init();
 
   /* USER CODE BEGIN 2 */
-printf("\r\n==== Flash Test Start ====\r\n");
-printf("Erase sector...\r\n");
-if(Flash_EraseSector(TEST_ADDR) == 0)
+printf("\r\n====BootloaderStart====\r\n");
+OtaMetaTypeDef ota_meta;
+Meta_Read(&ota_meta);
+printf("Meta:magic=0x%08X,run_slot=%d,update_flag=%d\r\n",
+ota_meta.magic,ota_meta.run_slot,ota_meta.update_flag);
+
+if(ota_meta.magic!=META_MAGIC)
 {
-    printf("Erase OK!\r\n");
+  printf("进入Meta初始化分支\r\n");
+  ota_meta.magic=META_MAGIC;
+  ota_meta.run_slot=0;
+  ota_meta.update_flag=0;
+  Meta_Write(&ota_meta);
+  printf("Meta首次初始化完成,默认启动A槽\r\n");
+}
+
+uint32_t run_app_addr=0U;
+BOOT_JUMP_RET ret;
+
+if(ota_meta.update_flag==1U)
+{
+  printf("检测到升级标志,开始校验B槽固件\r\n");
+  ret=Check_App_Valid(APP_B_BASE);
+  if(ret==JUMP_OK)
+  {
+    printf("校验通过,切换运行槽位B\r\n");
+    ota_meta.run_slot=1;
+    ota_meta.update_flag=0;
+    Meta_Write(&ota_meta);
+    run_app_addr=APP_B_BASE;
+  }
+  else
+  {
+    printf("B校验失败,回退到A槽,清除升级标志\r\n");
+    ota_meta.update_flag=0;
+    Meta_Write(&ota_meta);
+    run_app_addr=APP_A_BASE;
+  }
 }
 else
 {
-    printf("Erase FAIL!\r\n");
+  if(ota_meta.run_slot==1U)
+  {
+    run_app_addr=APP_B_BASE;
+    printf("按照标记启动B槽\r\n");
+  }
+  else
+  {
+    run_app_addr=APP_A_BASE;
+    printf("按照标记启动A槽\r\n");
+  }
 }
-printf("Start write data\r\n");
-Flash_Write(TEST_ADDR, write_buf, sizeof(write_buf), &next_offset);
-printf("Write done, next write addr: 0x%08X\r\n", next_offset);
-read_buf[0] = *(volatile uint32_t *)(TEST_ADDR);
-read_buf[1] = *(volatile uint32_t *)(TEST_ADDR + 4);
-printf("read[0] = 0x%08X\r\n", read_buf[0]);
-printf("read[1] = 0x%08X\r\n", read_buf[1]);
-if(read_buf[0]==0x11223344 && read_buf[1]==0x55667788)
+
+ret=Check_App_Valid(run_app_addr);
+if(ret==JUMP_OK)
 {
-    printf("✅ Flash write&read SUCCESS!\r\n");
+  printf("即将跳转APP,addr:0x%08X\r\n",run_app_addr);
+  HAL_Delay(500U);
+  Boot_jump_Exec(run_app_addr);
 }
-else
-{
-    printf("❌ Data mismatch!\r\n");
+else{
+  printf("目标APP校验失败 err=%d,停留在Bootloader\r\n",ret);
 }
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -140,7 +172,7 @@ else
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-   HAL_Delay(200);
+   HAL_Delay(300U);
   }
   /* USER CODE END 3 */
 }

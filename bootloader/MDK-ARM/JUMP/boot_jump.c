@@ -72,7 +72,7 @@ __attribute__((noreturn))static void Boot_Do_Jump(uint32_t sp,
         {
             return JUMP_ERR_PC_THUMB;
         }
-        uint32_t actual_pc=slot_pc&0xFFFFFFFFUL;
+        uint32_t actual_pc=slot_pc&0xFFFFFFFEUL;
         if((actual_pc<slot_base)||(actual_pc>=slot_base+SLOT_SIZE))
         {
             return JUMP_ERR_PC_OUT_RANGE;
@@ -80,3 +80,34 @@ __attribute__((noreturn))static void Boot_Do_Jump(uint32_t sp,
         Boot_Do_Jump(slot_sp,slot_pc,slot_base);
         return JUMP_OK;
     }
+
+void Meta_Read(OtaMetaTypeDef *meta)
+{
+    *meta=*(volatile OtaMetaTypeDef*)META_BASE;
+}
+void Meta_Write(OtaMetaTypeDef *meta)
+{
+    uint32_t dummy_next;
+    Flash_EraseSector(META_BASE);
+    Flash_Write(META_BASE,(uint8_t*)meta,sizeof(OtaMetaTypeDef),&dummy_next);
+    
+}
+BOOT_JUMP_RET Check_App_Valid(uint32_t app_addr)
+{
+    uint32_t slot_sp=*(volatile uint32_t*)app_addr;
+    uint32_t slot_pc=*(volatile uint32_t*)(app_addr+4U);
+    if((slot_sp<0x20000000UL)||slot_sp>=0x20020000UL)
+    {
+        return JUMP_ERR_SP_INVALID;
+    }
+    if((slot_pc&0x1UL)==0UL)
+    {
+        return JUMP_ERR_PC_THUMB;
+    }
+    uint32_t actual_pc=slot_pc&0xFFFFFFFEUL;
+    if((actual_pc<app_addr)||actual_pc>=app_addr+SLOT_SIZE)
+    {
+        return JUMP_ERR_PC_OUT_RANGE;
+    }
+    return JUMP_OK;
+}
