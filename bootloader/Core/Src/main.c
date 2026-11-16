@@ -18,7 +18,8 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "stdio.h"
+#include <stdio.h>
+#include <string.h>
 #include "flash_driver.h"
 #include "boot_jump.h"
 
@@ -102,17 +103,19 @@ int main(void)
 printf("\r\n====BootloaderStart====\r\n");
 OtaMetaTypeDef ota_meta;
 Meta_Read(&ota_meta);
+uint32_t real_magic=ota_meta.magic;
 printf("Meta:magic=0x%08X,run_slot=%d,update_flag=%d\r\n",
 ota_meta.magic,ota_meta.run_slot,ota_meta.update_flag);
 
-if(ota_meta.magic!=META_MAGIC)
+if(real_magic!=META_MAGIC)
 {
-  printf("进入Meta初始化分支\r\n");
+  printf("\r\n====Enter the initialization branch====\r\n");
+  memset(&ota_meta,0,sizeof(ota_meta));
   ota_meta.magic=META_MAGIC;
   ota_meta.run_slot=0;
   ota_meta.update_flag=0;
   Meta_Write(&ota_meta);
-  printf("Meta首次初始化完成,默认启动A槽\r\n");
+  printf("\r\n==Meta initial setup completed,start Slot A==\r\n");
 }
 
 uint32_t run_app_addr=0U;
@@ -120,11 +123,11 @@ BOOT_JUMP_RET ret;
 
 if(ota_meta.update_flag==1U)
 {
-  printf("检测到升级标志,开始校验B槽固件\r\n");
+  printf("\r\n==Update flag detected,going to verify Slot B==\r\n");
   ret=Check_App_Valid(APP_B_BASE);
   if(ret==JUMP_OK)
   {
-    printf("校验通过,切换运行槽位B\r\n");
+    printf("\r\n==Verification passed,switch to Slot B==\r\n");
     ota_meta.run_slot=1;
     ota_meta.update_flag=0;
     Meta_Write(&ota_meta);
@@ -132,7 +135,7 @@ if(ota_meta.update_flag==1U)
   }
   else
   {
-    printf("B校验失败,回退到A槽,清除升级标志\r\n");
+    printf("\r\n==Verification failed,back to Slot A==\r\n");
     ota_meta.update_flag=0;
     Meta_Write(&ota_meta);
     run_app_addr=APP_A_BASE;
@@ -143,24 +146,30 @@ else
   if(ota_meta.run_slot==1U)
   {
     run_app_addr=APP_B_BASE;
-    printf("按照标记启动B槽\r\n");
+    printf("\r\n====Start Slot B according to flag====\r\n");
   }
   else
   {
     run_app_addr=APP_A_BASE;
-    printf("按照标记启动A槽\r\n");
+    printf("\r\n====Start Slot A according to flag====\r\n");
   }
 }
 
 ret=Check_App_Valid(run_app_addr);
 if(ret==JUMP_OK)
 {
-  printf("即将跳转APP,addr:0x%08X\r\n",run_app_addr);
+  printf("Soon Jump to App,addr:0x%08X\r\n",run_app_addr);
   HAL_Delay(500U);
+	
   Boot_jump_Exec(run_app_addr);
+  while(1)
+  {
+    HAL_Delay(5000);
+    printf("boot still hold....");
+  }
 }
 else{
-  printf("目标APP校验失败 err=%d,停留在Bootloader\r\n",ret);
+  printf("Verification failed,err=%d,Stay at Bootloader\r\n",ret);
 }
 
   /* USER CODE END 2 */
@@ -172,7 +181,8 @@ else{
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-   HAL_Delay(300U);
+   HAL_Delay(5000U);
+
   }
   /* USER CODE END 3 */
 }

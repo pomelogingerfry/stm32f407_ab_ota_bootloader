@@ -18,12 +18,12 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "string.h"
+#include "usart.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -87,8 +87,6 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_USART3_UART_Init();
-  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 uint8_t rec_buf[16]={0};
 uint16_t rec_len=0;
@@ -102,8 +100,8 @@ uint16_t rec_len=0;
     HAL_UART_Receive(&huart1, &ch, 1, HAL_MAX_DELAY);
     HAL_UART_Transmit(&huart1, &ch, 1, 100);
     */
-   HAL_UARTEx_ReceiveToIdle(&huart3,rec_buf,16,&rec_len,HAL_MAX_DELAY);
-   if(rec_buf>0){
+   HAL_UARTEx_ReceiveToIdle(&huart1,rec_buf,16,&rec_len,HAL_MAX_DELAY);
+   if(rec_len>0){
     HAL_UART_Transmit(&huart3,rec_buf,16,1000);
     memset(rec_buf,0,16);
     rec_len=0;
@@ -116,7 +114,7 @@ uint16_t rec_len=0;
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
-}
+
 
 /**
   * @brief System Clock Configuration

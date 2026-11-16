@@ -184,7 +184,7 @@
             <hadIRAM>1</hadIRAM>
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
-            <RvdsVP>2</RvdsVP>
+            <RvdsVP>1</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
             <nBranchProt>0</nBranchProt>
@@ -341,7 +341,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F407xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;./JUMP;../../falsh_parttion;./FLASH_DRIVER</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;../../falsh_parttion;..\JUMP;..\FLASH_DRIVER;..\HARDFAULT_BOOT</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -513,12 +513,12 @@
             <File>
               <FileName>boot_jump.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\JUMP\boot_jump.c</FilePath>
+              <FilePath>..\JUMP\boot_jump.c</FilePath>
             </File>
             <File>
               <FileName>boot_jump.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\JUMP\boot_jump.h</FilePath>
+              <FilePath>..\JUMP\boot_jump.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -528,12 +528,27 @@
             <File>
               <FileName>flash_driver.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\FLASH_DRIVER\flash_driver.c</FilePath>
+              <FilePath>..\FLASH_DRIVER\flash_driver.c</FilePath>
             </File>
             <File>
               <FileName>flash_driver.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\FLASH_DRIVER\flash_driver.h</FilePath>
+              <FilePath>..\FLASH_DRIVER\flash_driver.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>HardFault</GroupName>
+          <Files>
+            <File>
+              <FileName>hardfault_boot.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDFAULT_BOOT\hardfault_boot.c</FilePath>
+            </File>
+            <File>
+              <FileName>hardfault_boot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\HARDFAULT_BOOT\hardfault_boot.h</FilePath>
             </File>
           </Files>
         </Group>
