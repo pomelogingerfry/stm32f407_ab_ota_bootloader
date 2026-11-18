@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>app_b</TargetName>
+      <TargetName>app_a</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pArmCC>6220000::V6.22::ARMCLANG</pArmCC>
@@ -50,7 +50,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Objects\</OutputDirectory>
-          <OutputName>app_b</OutputName>
+          <OutputName>app_a</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -83,7 +83,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>fromelf --bin --output=./firmware/app/app_b.bin ./Objects/app_b.axf</UserProg1Name>
+            <UserProg1Name>fromelf --bin --output=./firmware/app/app_a.bin ./Objects/app_a.axf</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -184,14 +184,14 @@
             <hadIRAM>1</hadIRAM>
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
-            <RvdsVP>2</RvdsVP>
+            <RvdsVP>1</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
             <nBranchProt>0</nBranchProt>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
-            <useUlib>0</useUlib>
+            <useUlib>1</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
             <nSecure>0</nSecure>
@@ -277,7 +277,7 @@
               </OCR_RVCT3>
               <OCR_RVCT4>
                 <Type>1</Type>
-                <StartAddress>0x8080000</StartAddress>
+                <StartAddress>0x8040000</StartAddress>
                 <Size>0x40000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
@@ -341,7 +341,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F407xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;..\..\..\falsh_parttion;..\HARDFAULT_B</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;..\..\falsh_parttion;..\..\hardfault_capture</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -372,7 +372,7 @@
             <TextAddressRange></TextAddressRange>
             <DataAddressRange></DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>..\appb.sct</ScatterFile>
+            <ScatterFile>..\appa.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -498,17 +498,27 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>HardFault</GroupName>
+          <GroupName>flash_partition</GroupName>
           <Files>
             <File>
-              <FileName>hardfault_appb.c</FileName>
+              <FileName>flash_partition.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\falsh_parttion\flash_partition.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>HardFault_Capture</GroupName>
+          <Files>
+            <File>
+              <FileName>hardfault_capture.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\HARDFAULT_B\hardfault_appb.c</FilePath>
+              <FilePath>..\..\hardfault_capture\hardfault_capture.c</FilePath>
             </File>
             <File>
-              <FileName>hardfault_appb.h</FileName>
+              <FileName>hardfault_capture.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\HARDFAULT_B\hardfault_appb.h</FilePath>
+              <FilePath>..\..\hardfault_capture\hardfault_capture.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -525,7 +535,7 @@
       <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="6.1.0" condition="ARMv6_7_8-M Device">
         <package name="CMSIS" schemaVersion="1.7.36" url="https://www.keil.com/pack/" vendor="ARM" version="6.1.0"/>
         <targetInfos>
-          <targetInfo name="app_b"/>
+          <targetInfo name="app_a"/>
         </targetInfos>
       </component>
     </components>
@@ -535,7 +545,7 @@
   <LayerInfo>
     <Layers>
       <Layer>
-        <LayName>app_b</LayName>
+        <LayName>app_a</LayName>
         <LayPrjMark>1</LayPrjMark>
       </Layer>
     </Layers>

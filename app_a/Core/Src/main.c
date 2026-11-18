@@ -19,9 +19,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "flash_partition.h"
+#include <stdio.h>
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+UART_HandleTypeDef huart3;
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -40,10 +41,10 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-UART_HandleTypeDef huart3;
+
 
 /* USER CODE BEGIN PV */
-
+extern UART_HandleTypeDef huart3; 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -56,7 +57,10 @@ static void MX_USART3_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+int fputc(int ch, FILE *f) {
+    HAL_UART_Transmit(&huart3, (uint8_t *)&ch, 1, 0xFFFF);
+    return ch;
+}
 /* USER CODE END 0 */
 
 /**
@@ -67,7 +71,9 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-	
+  SCB->VTOR = 0x08040000; 
+  __DSB();
+  __ISB();
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -76,11 +82,12 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
+  __enable_irq();
 
   /* USER CODE END Init */
 
   /* Configure the system clock */
-  SystemClock_Config();
+ // SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
 
@@ -90,18 +97,18 @@ int main(void)
   MX_GPIO_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-
+printf("\r\n=== APP Started Successfully! ===\r\n");
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		HAL_UART_Transmit(&huart3,(uint8_t*)"ok\r\n",4,100);
-		HAL_Delay(2000);
+		;
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+   
   }
   /* USER CODE END 3 */
 }
@@ -150,6 +157,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+  
 }
 
 /**

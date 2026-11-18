@@ -139,7 +139,7 @@
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2V8M.DLL</Flash2>
-          <Flash3></Flash3>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -339,9 +339,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>USE_HAL_DRIVER,STM32F407xx</Define>
+              <Define>USE_HAL_DRIVER,STM32F407xx,BOOTLOADER</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;../../falsh_parttion;..\JUMP;..\FLASH_DRIVER;..\HARDFAULT_BOOT</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;../../falsh_parttion;../JUMP;../FLASH_DRIVER;../../hardfault_capture</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -538,17 +538,17 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>HardFault</GroupName>
+          <GroupName>HardFault_Capture</GroupName>
           <Files>
             <File>
-              <FileName>hardfault_boot.c</FileName>
+              <FileName>hardfault_capture.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\HARDFAULT_BOOT\hardfault_boot.c</FilePath>
+              <FilePath>..\..\hardfault_capture\hardfault_capture.c</FilePath>
             </File>
             <File>
-              <FileName>hardfault_boot.h</FileName>
+              <FileName>hardfault_capture.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\HARDFAULT_BOOT\hardfault_boot.h</FilePath>
+              <FilePath>..\..\hardfault_capture\hardfault_capture.h</FilePath>
             </File>
           </Files>
         </Group>

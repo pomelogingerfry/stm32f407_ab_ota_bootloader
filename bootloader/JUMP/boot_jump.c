@@ -41,29 +41,29 @@ void Jump_ToApp(uint32_t app_adr){
     void Boot_Do_Jump(uint32_t sp,
     uint32_t pc,uint32_t vtor_addr)
     {
-       
-       for(uint8_t i=0;i<8;i++)
-       {
-        NVIC->ICER[i]=0xFFFFFFFF;
-        NVIC->ICPR[i]=0xFFFFFFFF;
-       }
-       SysTick->CTRL=0;
+        printf("entered do jump\r\n");
         __disable_irq();
-        __set_MSP(sp);
+        SysTick->CTRL=0;
+        SysTick->LOAD=0;
+        SysTick->VAL=0;
+        for(uint32_t i=0;i<8;i++)
+        {
+            NVIC->ICER[i]=0xFFFFFFFF;
+            NVIC->ICPR[i]=0xFFFFFFFF;
+        }
+        HAL_RCC_DeInit();
 
         SCB->VTOR=vtor_addr;
         __DSB();
         __ISB();
-volatile uint32_t addr=pc;
-        typedef void (*resetfunc)(void);
-        resetfunc resetentry=(resetfunc)addr;
-        printf("11\r\n");
-        resetentry();
+       __asm volatile (
+        "msr msp, %0 \n"
+        "bx %1        \n"
+        : : "r" (sp), "r" (pc) : "memory"
+    );
 
         while(1)
         {
-printf("33\r\n");
-HAL_Delay(5000);
         }
     }
     BOOT_JUMP_RET Boot_jump_Exec(uint32_t slot_base)
@@ -73,18 +73,15 @@ HAL_Delay(5000);
         uint32_t slot_pc=*(volatile uint32_t *)(slot_base+4U);
         if((slot_sp<0x20000000UL)||(slot_sp>=0x20020000UL))
         {
-            printf("1\r\n");
             return JUMP_ERR_SP_INVALID;
         }
         if((slot_pc&0x1UL)==0UL)
         {
-            printf("2\r\n");
             return JUMP_ERR_PC_THUMB;
         }
         uint32_t actual_pc=slot_pc&0xFFFFFFFEUL;
         if((actual_pc<slot_base)||(actual_pc>=slot_base+SLOT_SIZE))
         {
-            printf("3\r\n");
             return JUMP_ERR_PC_OUT_RANGE;
         }
         Boot_Do_Jump(slot_sp,slot_pc,slot_base);
