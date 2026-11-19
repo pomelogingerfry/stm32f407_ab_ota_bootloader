@@ -209,7 +209,7 @@ uint8_t FaultSnapshot_Clear(void)
     FLASH_EraseInitTypeDef erase_settings={0};
     uint32_t erase_err=0U;
     uint8_t ret=0U;
-     HAL_FLASH_Unlock();
+    HAL_FLASH_Unlock();
 
     erase_settings.TypeErase=FLASH_TYPEERASE_SECTORS;
     erase_settings.Sector=FLASH_SECTOR_10;
