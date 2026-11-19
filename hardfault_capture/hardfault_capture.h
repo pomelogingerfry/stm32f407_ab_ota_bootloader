@@ -23,17 +23,21 @@ typedef struct __attribute((packed))
     uint32_t magic;
     uint32_t reserved[4];
 
-}FaultSnapshot_s;
+}FaultSnapshot_ts;
 
-#define FAULT_SNAPSHOT_MAGIC 0xABCDDCBAUL
+#define FAULT_MAGIC_HARD 0xABCDDCBAUL
 
-extern FaultSnapshot_s glo_faul_snapshot_buf;
+#define FAULT_MAGIC_SOFT 0xDDCCBBAAUL
 
-void HardFault_Capture(uint32_t *sp);
+extern volatile FaultSnapshot_ts glo_faul_snapshot_buf;
 
-void Fault_SaveFromErrorHandler(void);
+void HardFault_Capture(uint32_t *sp,uint32_t exc_return);
+
+void Fault_SaveFromErrorHandler(uint32_t fault_pc);
 
 #ifdef BOOTLOADER
+
+uint8_t FaultSnapshot_CheckAndSavetoflash(void);
 
 uint8_t FaultSnapshot_Clear(void);
 

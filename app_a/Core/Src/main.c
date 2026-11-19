@@ -23,6 +23,9 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 UART_HandleTypeDef huart3;
+#include "flash_partition.h"
+#include"hardfault_capture.h"
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -98,6 +101,10 @@ int main(void)
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 printf("\r\n=== APP Started Successfully! ===\r\n");
+HAL_Delay(1000);
+printf("going to inject app instead\r\n");
+//void(*illegal_func)(void)=(void(*)(void))0xFFFFFFFE;
+//illegal_func();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -223,6 +230,7 @@ static void MX_GPIO_Init(void)
   * @brief  This function is executed in case of error occurrence.
   * @retval None
   */
+#ifdef HH
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
@@ -233,6 +241,7 @@ void Error_Handler(void)
   }
   /* USER CODE END Error_Handler_Debug */
 }
+#endif
 #ifdef USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number

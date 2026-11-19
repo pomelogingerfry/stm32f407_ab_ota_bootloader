@@ -21,6 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include"hardfault_capture.h"
 #include "boot_jump.h"
 #include "string.h"
 /* USER CODE END Includes */
@@ -32,7 +33,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define FAULT_HALT_ON_CAPTURE   1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -45,6 +46,7 @@ UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 #include <stdio.h>
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -96,8 +98,24 @@ int main(void)
   MX_GPIO_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-printf("\r\n-------BootloaderStart--------\r\n");
-HAL_Delay(1000);
+  printf("\r\n-------BootloaderStart--------\r\n");
+  printf("RAM magic:0x%08X\r\n",glo_faul_snapshot_buf.magic);
+
+  uint8_t fault_saved=FaultSnapshot_CheckAndSavetoflash();
+
+  FaultSnapshot_LoadAndPrint();
+
+  if((fault_saved!=0U)&&(FAULT_HALT_ON_CAPTURE!=0))
+  {
+    printf("\r\n---Fault snapshot captured, bootloader halted---\r\n");
+    printf("---Reset to retry; erase FAULT sector to resume OTA---\r\n");
+    while(1)
+    {
+      HAL_Delay(1000);
+    }
+  }
+
+  HAL_Delay(1000);
 
 OtaMetaTypeDef ota_meta;
 Meta_Read(&ota_meta);
@@ -164,7 +182,27 @@ if(ret==JUMP_OK)
 {
   printf("Soon Jump to App,addr:0x%08X\r\n",run_app_addr);
   HAL_Delay(1000);
-	
+
+  /*printf("going to inject HardFault (Boot)\r\n");
+  HAL_Delay(1000);
+  GPIOC->ODR^=(1<<13);
+  volatile uint32_t *null_p=(uint32_t*)0x00000000;
+  *null_p=0x12345678;
+  void(*illegal_func)(void)=(void(*)(void))0xFFFFFFFE;
+  illegal_func();
+
+glo_faul_snapshot_buf.magic=FAULT_MAGIC_HARD;
+glo_faul_snapshot_buf.pc=0x12345678;
+glo_faul_snapshot_buf.lr=0x87654321;
+glo_faul_snapshot_buf.cfsr=0xABCD;
+if(FaultSnapshot_CheckAndSavetoflash()){
+  printf("sucess\r\n");
+}
+else{
+  printf("failed\r\n");
+}
+NVIC_SystemReset();
+*/
   Boot_jump_Exec(run_app_addr);
   while(1)
   {
@@ -185,7 +223,7 @@ else{
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    printf("app is running...\r\n");
+    printf("boot is running...\r\n");
     HAL_Delay(10000);
   }
   /* USER CODE END 3 */
@@ -300,7 +338,8 @@ static void MX_GPIO_Init(void)
   * @brief  This function is executed in case of error occurrence.
   * @retval None
   */
-void Error_Handler(void)
+#ifdef HH
+  void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
@@ -310,6 +349,7 @@ void Error_Handler(void)
   }
   /* USER CODE END Error_Handler_Debug */
 }
+#endif
 #ifdef USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number

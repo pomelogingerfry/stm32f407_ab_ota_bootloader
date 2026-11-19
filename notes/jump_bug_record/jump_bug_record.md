@@ -1,4 +1,4 @@
-## Jump程序调试过程中遇到的问题
+# Jump程序调试过程中遇到的问题
 1.bootloader侧没有hal rcc deinit
 
 2.使用c语言函数指针进行跳转，压栈动作破坏栈顶数据
@@ -16,3 +16,5 @@
 8.boot侧没有关systick，app中main函数执行hal init时会调用hal initsystick重新配置systick，如果这时候还有旧的systick状态残留，会直接配死
 
 9.system clock config配置问题，bootloader侧没有rcc deinit
+
+
