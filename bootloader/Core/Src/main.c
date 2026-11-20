@@ -18,12 +18,9 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include"hardfault_capture.h"
-#include "boot_jump.h"
-#include "string.h"
+#include<stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -33,7 +30,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define FAULT_HALT_ON_CAPTURE   1
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -43,27 +40,28 @@
 
 /* Private variables ---------------------------------------------------------*/
 UART_HandleTypeDef huart3;
+DMA_HandleTypeDef hdma_usart3_rx;
+DMA_HandleTypeDef hdma_usart3_tx;
 
 /* USER CODE BEGIN PV */
-#include <stdio.h>
-
+uint8_t rx_buffer[1024];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
-
+int fputc(int ch,FILE *f)
+{
+  HAL_UART_Transmit(&huart3,(uint8_t*)&ch,1,HAL_MAX_DELAY);
+  return ch;
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-int fputc(int ch, FILE *f) {
-    HAL_UART_Transmit(&huart3, (uint8_t *)&ch, 1, 0xFFFF);
-    return ch;
-}
-
 
 /* USER CODE END 0 */
 
@@ -96,124 +94,11 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-  printf("\r\n-------BootloaderStart--------\r\n");
-  printf("RAM magic:0x%08X\r\n",glo_faul_snapshot_buf.magic);
-
-  uint8_t fault_saved=FaultSnapshot_CheckAndSavetoflash();
-
-  FaultSnapshot_LoadAndPrint();
-
-  if((fault_saved!=0U)&&(FAULT_HALT_ON_CAPTURE!=0))
-  {
-    printf("\r\n---Fault snapshot captured, bootloader halted---\r\n");
-    printf("---Reset to retry; erase FAULT sector to resume OTA---\r\n");
-    while(1)
-    {
-      HAL_Delay(1000);
-    }
-  }
-
-  HAL_Delay(1000);
-
-OtaMetaTypeDef ota_meta;
-Meta_Read(&ota_meta);
-uint32_t real_magic=ota_meta.magic;
-printf("Meta:magic=0x%08X,run_slot=%d,update_flag=%d\r\n",
-ota_meta.magic,ota_meta.run_slot,ota_meta.update_flag);
-
-if(real_magic!=META_MAGIC)
-{
-  printf("\r\n------Enter the initialization branch------\r\n");
-  HAL_Delay(1000);
-  memset(&ota_meta,0,sizeof(ota_meta));
-  ota_meta.magic=META_MAGIC;
-  ota_meta.run_slot=0;
-  ota_meta.update_flag=0;
-  Meta_Write(&ota_meta);
-  printf("\r\n---Meta initial setup completed,start Slot A---\r\n");
-  HAL_Delay(1000);
-}
-
-uint32_t run_app_addr=0U;
-BOOT_JUMP_RET ret;
-
-if(ota_meta.update_flag==1U)
-{
-  printf("\r\n---Update flag detected,going to verify Slot B---\r\n");
-  HAL_Delay(1000);
-  ret=Check_App_Valid(APP_B_BASE);
-  if(ret==JUMP_OK)
-  {
-    printf("\r\n---Verification passed,switch to Slot B---\r\n");
-    HAL_Delay(1000);
-    ota_meta.run_slot=1;
-    ota_meta.update_flag=0;
-    Meta_Write(&ota_meta);
-    run_app_addr=APP_B_BASE;
-  }
-  else
-  {
-    printf("\r\n-----Verification failed,back to Slot A-----\r\n");
-    HAL_Delay(1000);
-    ota_meta.update_flag=0;
-    Meta_Write(&ota_meta);
-    run_app_addr=APP_A_BASE;
-  }
-}
-else
-{
-  if(ota_meta.run_slot==1U)
-  {
-    run_app_addr=APP_B_BASE;
-    printf("\r\n-----Start Slot B according to flag-----\r\n");
-    HAL_Delay(1000);
-  }
-  else
-  {
-    run_app_addr=APP_A_BASE;
-    printf("\r\n-----Start Slot A according to flag-----\r\n");
-  }
-}
-
-ret=Check_App_Valid(run_app_addr);
-if(ret==JUMP_OK)
-{
-  printf("Soon Jump to App,addr:0x%08X\r\n",run_app_addr);
-  HAL_Delay(1000);
-
-  /*printf("going to inject HardFault (Boot)\r\n");
-  HAL_Delay(1000);
-  GPIOC->ODR^=(1<<13);
-  volatile uint32_t *null_p=(uint32_t*)0x00000000;
-  *null_p=0x12345678;
-  void(*illegal_func)(void)=(void(*)(void))0xFFFFFFFE;
-  illegal_func();
-
-glo_faul_snapshot_buf.magic=FAULT_MAGIC_HARD;
-glo_faul_snapshot_buf.pc=0x12345678;
-glo_faul_snapshot_buf.lr=0x87654321;
-glo_faul_snapshot_buf.cfsr=0xABCD;
-if(FaultSnapshot_CheckAndSavetoflash()){
-  printf("sucess\r\n");
-}
-else{
-  printf("failed\r\n");
-}
-NVIC_SystemReset();
-*/
-  Boot_jump_Exec(run_app_addr);
-  while(1)
-  {
-    HAL_Delay(5000);
-    printf("boot still hold....");
-  }
-}
-else{
-  printf("Verification failed,err=%d,Stay at Bootloader...\r\n",ret);
-}
-
+  HAL_UARTEx_ReceiveToIdle_DMA(&huart3,rx_buffer,sizeof(rx_buffer));
+  __HAL_DMA_DISABLE_IT(&hdma_usart3_rx,DMA_IT_HT);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -223,8 +108,6 @@ else{
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    printf("boot is running...\r\n");
-    HAL_Delay(10000);
   }
   /* USER CODE END 3 */
 }
@@ -309,6 +192,25 @@ static void MX_USART3_UART_Init(void)
 }
 
 /**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Stream1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream1_IRQn, 2, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream1_IRQn);
+  /* DMA1_Stream3_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 2, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn);
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -331,7 +233,13 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart,uint16_t size)
+{
+  if(huart->Instance==USART3)
+  {
+    printf("Received %d bytes\r\n",size);
+  }
+}
 /* USER CODE END 4 */
 
 /**
@@ -339,7 +247,7 @@ static void MX_GPIO_Init(void)
   * @retval None
   */
 #ifdef HH
-  void Error_Handler(void)
+void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
