@@ -4,7 +4,7 @@
 
 extern UART_HandleTypeDef huart3;
 
-uint32_t crc32_clac(const uint8_t *data,uint32_t len)
+uint32_t protocol_CRC32_clac(const uint8_t *data,uint32_t len)
 {
     uint32_t crc=0xFFFFFFFF;
     for(uint32_t i=0;i<len;i++)

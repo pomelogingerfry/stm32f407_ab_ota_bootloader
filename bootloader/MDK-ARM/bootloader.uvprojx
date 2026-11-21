@@ -575,6 +575,16 @@
               <FileType>5</FileType>
               <FilePath>..\BOOT_OTA\ota_protocol.h</FilePath>
             </File>
+            <File>
+              <FileName>boot_flag.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BOOT_OTA\boot_flag.c</FilePath>
+            </File>
+            <File>
+              <FileName>boot_flag.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\BOOT_OTA\boot_flag.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

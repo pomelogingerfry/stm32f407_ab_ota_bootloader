@@ -19,6 +19,8 @@ uint32_t Flash_GetSector(uint32_t addr);
 
 FLASH_STATUS_TYPE Flash_EraseSector(uint32_t sector_addr);
 
+FLASH_STATUS_TYPE Flash_Read(uint32_t source_addr,uint8_t *dsk_buf,uint32_t len);
+
 FLASH_STATUS_TYPE Flash_Write(uint32_t dest_addr,uint8_t *data_buf,
     uint32_t len_byte,uint32_t *next_wr_addr);
 

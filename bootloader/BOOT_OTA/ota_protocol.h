@@ -20,7 +20,7 @@ typedef struct
 }ota_frame_ts;
 #pragma pack(pop)
 
-uint32_t crc32_clac(const uint8_t *data,uint32_t len);
+uint32_t protocol_CRC32_clac(const uint8_t *data,uint32_t len);
 
 int ota_prase_frame(uint8_t *buf,uint16_t size,ota_frame_ts *out_frame);
 
