@@ -96,7 +96,6 @@ void HardFault_Handler(void)
   }
 }
 #endif
-
 /**
   * @brief This function handles Memory management fault.
   */

@@ -18,9 +18,14 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include<stdio.h>
+#include <stdio.h>
+#include <stdint.h>
+#include "error_code.h"
+#include "ota_protocol.h"
+#include "stm32f4xx_hal.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -55,7 +60,7 @@ static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
 int fputc(int ch,FILE *f)
 {
-  HAL_UART_Transmit(&huart3,(uint8_t*)&ch,1,HAL_MAX_DELAY);
+  HAL_UART_Transmit(&huart3,(uint8_t*)&ch,1,10000);
   return ch;
 }
 /* USER CODE END PFP */
@@ -97,8 +102,8 @@ int main(void)
   MX_DMA_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-  HAL_UARTEx_ReceiveToIdle_DMA(&huart3,rx_buffer,sizeof(rx_buffer));
-  __HAL_DMA_DISABLE_IT(&hdma_usart3_rx,DMA_IT_HT);
+HAL_UARTEx_ReceiveToIdle_DMA(&huart3,rx_buffer,sizeof(rx_buffer));
+__HAL_DMA_DISABLE_IT(&hdma_usart3_rx,DMA_IT_HT);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -237,7 +242,15 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart,uint16_t size)
 {
   if(huart->Instance==USART3)
   {
-    printf("Received %d bytes\r\n",size);
+    printf("Receive %d bytes via DMA\r\n",size);
+  }
+  ota_frame_ts test_frame;
+  if(ota_prase_frame(rx_buffer,size,&test_frame)==0)
+  {
+    printf("Got Frame type:%d,Seq:%d\r\n",test_frame.type,test_frame.seq);
+  }
+  else{
+    printf("error\r\n");
   }
 }
 /* USER CODE END 4 */

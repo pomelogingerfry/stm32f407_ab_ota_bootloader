@@ -8,7 +8,8 @@ typedef enum
     ERR_LEN=2,
     ERR_FLASH=3,
     ERR_TIMEOUT=4,
-    ERR_SLOT=5
+    ERR_SLOT=5,
+    ERR_NUM
 }ota_err_te;
 
 const char* err_to_str(ota_err_te err);
