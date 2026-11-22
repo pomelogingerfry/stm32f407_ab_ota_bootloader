@@ -139,7 +139,7 @@ FLASH_STATUS_TYPE Flash_CheckBlank(uint32_t addr,uint32_t len_byte)
 FLASH_STATUS_TYPE Flash_Read(uint32_t source_addr,
     uint8_t *dsk_buf,uint32_t len)
 {
-    if(source_addr<0x080000000||(source_addr+len)>0x08100000);
+    if(source_addr<0x080000000||(source_addr+len)>0x08100000)
     {
         return FLASH_ERR_ADDR;
     }

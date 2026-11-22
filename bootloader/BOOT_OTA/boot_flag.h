@@ -23,7 +23,7 @@ typedef struct __attribute__((packed))
     uint32_t reserved[5];
 } boot_flag_ts;
  
-uint32_t bootflag_CRC32_calc(const boot_flag_ts *flag);
+static uint32_t bootflag_CRC32_calc(const boot_flag_ts *flag);
 
 void BootFlag_Read(boot_flag_ts *flag);
 

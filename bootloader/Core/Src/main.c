@@ -102,8 +102,7 @@ int main(void)
   MX_DMA_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-HAL_UARTEx_ReceiveToIdle_DMA(&huart3,rx_buffer,sizeof(rx_buffer));
-__HAL_DMA_DISABLE_IT(&hdma_usart3_rx,DMA_IT_HT);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -238,21 +237,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart,uint16_t size)
-{
-  if(huart->Instance==USART3)
-  {
-    printf("Receive %d bytes via DMA\r\n",size);
-  }
-  ota_frame_ts test_frame;
-  if(ota_prase_frame(rx_buffer,size,&test_frame)==0)
-  {
-    printf("Got Frame type:%d,Seq:%d\r\n",test_frame.type,test_frame.seq);
-  }
-  else{
-    printf("error\r\n");
-  }
-}
+
 /* USER CODE END 4 */
 
 /**
