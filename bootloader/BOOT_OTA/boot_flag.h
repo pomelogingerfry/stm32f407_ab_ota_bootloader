@@ -5,6 +5,10 @@
 
 #define OTA_FLAG_MAGIC 0x44554554
 
+#define SLOT_A 0x00
+#define SLOT_B 0x01
+#define SLOT_NONE 0xFF
+
 #define FLAG_STATE_IDLE 0
 #define FLAG_STATE_TRIAL 1
 #define FLAG_STATE_CONFIRMED 2

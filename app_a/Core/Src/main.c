@@ -90,7 +90,7 @@ int main(void)
   /* USER CODE END Init */
 
   /* Configure the system clock */
- // SystemClock_Config();
+  SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
 
@@ -102,7 +102,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 printf("\r\n=== APP Started Successfully! ===\r\n");
 HAL_Delay(1000);
-printf("going to inject app instead\r\n");
+//printf("going to inject app instead\r\n");
 //void(*illegal_func)(void)=(void(*)(void))0xFFFFFFFE;
 //illegal_func();
   /* USER CODE END 2 */

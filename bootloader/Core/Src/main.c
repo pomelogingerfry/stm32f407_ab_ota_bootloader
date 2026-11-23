@@ -23,8 +23,8 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <stdint.h>
-#include "error_code.h"
 #include "ota_protocol.h"
+#include "state_machine.h"
 #include "stm32f4xx_hal.h"
 /* USER CODE END Includes */
 
@@ -102,6 +102,14 @@ int main(void)
   MX_DMA_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
+printf("\r\n==================================\r\n");
+printf("Bootloader Started,Waiting 3s...\r\n");
+printf("\r\n==================================\r\n");
+
+StateMachine_Init();
+
+HAL_UARTEx_ReceiveToIdle_DMA(&huart3,rx_buffer,sizeof(rx_buffer));
+__HAL_DMA_DISABLE_IT(&hdma_usart3_rx,DMA_IT_HT);
 
   /* USER CODE END 2 */
 
@@ -109,6 +117,13 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    StateMachine_Run();
+
+    if(ota_rx_flag==1)
+    {
+      ota_rx_flag=0;
+      StateMachine_OneFrameReceived();
+    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -237,7 +252,13 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart,uint16_t size)
+{
+  if(huart->Instance==USART3)
+  {
+    OTA_Protocol_Parse(rx_buffer,size);
+  }
+}
 /* USER CODE END 4 */
 
 /**

@@ -83,7 +83,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>fromelf --bin --output ..\..\firmware\bootloader\bootloader.bin .\BOOT-LOADER\BOOT-LOADER.axf</UserProg1Name>
+            <UserProg1Name>fromelf --bin --output ..\..\firmware\bootloader\bootloader.bin .\bootloader\bootloader.axf</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -584,6 +584,16 @@
               <FileName>boot_flag.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\BOOT_OTA\boot_flag.h</FilePath>
+            </File>
+            <File>
+              <FileName>state_machine.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BOOT_OTA\state_machine.c</FilePath>
+            </File>
+            <File>
+              <FileName>state_machine.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\BOOT_OTA\state_machine.h</FilePath>
             </File>
           </Files>
         </Group>
