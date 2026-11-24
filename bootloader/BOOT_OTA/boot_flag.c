@@ -35,9 +35,9 @@ void BootFlag_Read(boot_flag_ts *flag)
     Flash_Read(META_BASE,(uint8_t*)&flag_a,sizeof(boot_flag_ts));
     Flash_Read(META_MIRROR_BASE,(uint8_t*)&flag_b,sizeof(boot_flag_ts));
     uint8_t valid_a=(flag_a.magic==OTA_FLAG_MAGIC)
-    &&(flag->flag_crc==bootflag_CRC32_calc(&flag_a));
+    &&(flag_a.flag_crc==bootflag_CRC32_calc(&flag_a));
     uint8_t valid_b=(flag_b.magic==OTA_FLAG_MAGIC)
-    &&(flag->flag_crc==bootflag_CRC32_calc(&flag_b));
+    &&(flag_b.flag_crc==bootflag_CRC32_calc(&flag_b));
 
     if(valid_a&&valid_b){
         *flag=(flag_a.seq>flag_b.seq)?flag_a:flag_b;

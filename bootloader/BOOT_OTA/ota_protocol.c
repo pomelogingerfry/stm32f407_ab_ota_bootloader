@@ -26,7 +26,7 @@ static uint32_t protocol_CRC32_clac(uint32_t crc,uint8_t data)
             crc=(crc>>1)^(0xEDB88320&(-(crc&1)));
         }
     
-    return ~crc;
+    return crc;
 }
 
 void OTA_Protocol_Parse(uint8_t *buf,uint16_t size)

@@ -25,6 +25,7 @@
 #include <stdint.h>
 #include "ota_protocol.h"
 #include "state_machine.h"
+#include "ring_buffer.h"
 #include "stm32f4xx_hal.h"
 /* USER CODE END Includes */
 
@@ -49,7 +50,9 @@ DMA_HandleTypeDef hdma_usart3_rx;
 DMA_HandleTypeDef hdma_usart3_tx;
 
 /* USER CODE BEGIN PV */
-uint8_t rx_buffer[1024];
+uint8_t rx_buffer[256];
+Ring_Buffer_ts uart_tp;
+uint8_t parse_buffer[128];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -102,9 +105,11 @@ int main(void)
   MX_DMA_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-printf("\r\n==================================\r\n");
-printf("Bootloader Started,Waiting 3s...\r\n");
-printf("\r\n==================================\r\n");
+printf("\r\n====================================\r\n");
+printf("Bootloader Started\r\n");
+printf("\r\n====================================\r\n");
+
+RingBuffer_Init(&uart_tp);
 
 StateMachine_Init();
 
@@ -119,10 +124,20 @@ __HAL_DMA_DISABLE_IT(&hdma_usart3_rx,DMA_IT_HT);
   {
     StateMachine_Run();
 
-    if(ota_rx_flag==1)
+    uint32_t avail=RingBuffer_Available(&uart_tp);
+
+    if(avail>0)
     {
-      ota_rx_flag=0;
-      StateMachine_OneFrameReceived();
+      uint32_t to_read=(avail>sizeof(parse_buffer))?sizeof(parse_buffer):avail;
+      uint32_t read_len=RingBuffer_Read(&uart_tp,parse_buffer,to_read);
+
+      OTA_Protocol_Parse(parse_buffer,read_len);
+
+      if(ota_rx_flag)
+      {
+        ota_rx_flag=0;
+        StateMachine_OneFrameReceived();
+      }
     }
     /* USER CODE END WHILE */
 
@@ -256,7 +271,10 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart,uint16_t size)
 {
   if(huart->Instance==USART3)
   {
-    OTA_Protocol_Parse(rx_buffer,size);
+    if(!RingBuffer_Write(&uart_tp,rx_buffer,size))
+    {
+      printf("Write to Buffer Error\r\n");
+    }
   }
 }
 /* USER CODE END 4 */

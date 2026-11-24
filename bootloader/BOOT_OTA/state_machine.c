@@ -28,9 +28,9 @@ typedef struct
         uint32_t expected_size;
         uint32_t expected_crc;
         uint16_t expect_seq;
-    }Sm_Context_te;
+    }Sm_Context_ts;
 
- static Sm_Context_te sm_ctx;
+ static Sm_Context_ts sm_ctx;
  static boot_flag_ts sys_flag;
  
  static void Sm_ChangeState(Sm_State_te new_state)
@@ -48,7 +48,7 @@ static uint32_t Calc_FlashCRC32(uint32_t start_addr,uint32_t size)
     while(offset<size){
         uint32_t read_size=(size-offset>256)?256:(size-offset);
         Flash_Read(start_addr+offset,buffer,read_size);
-        for(uint32_t i=0;i<read_size;i++){
+        for(uint32_t i=0;i<8;i++){
             crc^=buffer[i];
             for(int a=0;a<read_size;a++){
                 if(crc&1)crc=(crc>>1)^0xEDB88320;
@@ -271,6 +271,8 @@ __asm volatile (
             sm_ctx.total_received+=ota_packet.len;
             sm_ctx.expect_seq++;
             sm_ctx.timeout_tick=HAL_GetTick();
+
+            OTA_Protocol_SendAck(ota_packet.seq,0);
 
             if(ota_packet.seq%20==0){
                 printf("[SM]Progress:%u/%u bytes\r\n",
