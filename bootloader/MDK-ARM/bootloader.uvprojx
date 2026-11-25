@@ -341,7 +341,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F407xx,BOOTLOADER</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;..\FLASH_DRIVER;..\BOOT_OTA;..\..\app_a;..\..\app_b;..\..\falsh_parttion;..\..\firmware;..\..\hardfault_capture</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;..\FLASH_DRIVER;..\BOOT_OTA;..\..\app_a;..\..\app_b;..\..\falsh_parttion;..\..\firmware;..\..\hardfault_capture;..\TASK_MONITOR</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -604,6 +604,21 @@
               <FileName>ring_buffer.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\BOOT_OTA\ring_buffer.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>TaskMonitor</GroupName>
+          <Files>
+            <File>
+              <FileName>task_monitor_boot.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\TASK_MONITOR\task_monitor_boot.c</FilePath>
+            </File>
+            <File>
+              <FileName>task_monitor_boot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\TASK_MONITOR\task_monitor_boot.h</FilePath>
             </File>
           </Files>
         </Group>

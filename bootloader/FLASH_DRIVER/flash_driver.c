@@ -94,7 +94,7 @@ uint32_t len_byte,uint32_t *next_wr_addr)
         uint32_t temp=0xFFFFFFFFU;
         for(uint32_t i=0U;i<rest_bytes;i++)
         {
-            *(volatile uint8_t *)&temp=rest_in[i];
+            *((volatile uint8_t *)&temp+i)=rest_in[i];
         }
         uint32_t rest_write_addr=dest_addr+full_word_len*4U;
         if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD,rest_write_addr,temp)!=HAL_OK)

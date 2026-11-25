@@ -39,7 +39,7 @@ bool RingBuffer_Write(Ring_Buffer_ts *tp,const uint8_t *data,uint32_t len)
         memcpy(&tp->buffer[idx],data,to_end);
         memcpy(&tp->buffer[0],data+to_end,len-to_end);
     }
-    __DMB();
+    __asm volatile("dmb":::"memory");
     tp->wr=wr+len;
     return true;
 }
@@ -66,7 +66,7 @@ uint32_t RingBuffer_Read(Ring_Buffer_ts *tp,uint8_t *desk,uint32_t max_len)
         memcpy(desk,&tp->buffer[idx],to_end);
         memcpy(desk+to_end,&tp->buffer[0],read_len-to_end);
     }
-    __DMB();
+    __asm volatile("dmb":::"memory");
     tp->rd=rd+read_len;
     return read_len;
 }

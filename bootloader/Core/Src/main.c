@@ -27,6 +27,7 @@
 #include "state_machine.h"
 #include "ring_buffer.h"
 #include "stm32f4xx_hal.h"
+#include "task_monitor_boot.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -113,6 +114,8 @@ RingBuffer_Init(&uart_tp);
 
 StateMachine_Init();
 
+TaskMonitor_Init();
+
 HAL_UARTEx_ReceiveToIdle_DMA(&huart3,rx_buffer,sizeof(rx_buffer));
 __HAL_DMA_DISABLE_IT(&hdma_usart3_rx,DMA_IT_HT);
 
@@ -123,14 +126,13 @@ __HAL_DMA_DISABLE_IT(&hdma_usart3_rx,DMA_IT_HT);
   while (1)
   {
     StateMachine_Run();
+    TaskMonitor_Feed(TASK_ID_SM_RUN);
 
     uint32_t avail=RingBuffer_Available(&uart_tp);
-
     if(avail>0)
     {
       uint32_t to_read=(avail>sizeof(parse_buffer))?sizeof(parse_buffer):avail;
       uint32_t read_len=RingBuffer_Read(&uart_tp,parse_buffer,to_read);
-
       OTA_Protocol_Parse(parse_buffer,read_len);
 
       if(ota_rx_flag)
@@ -139,6 +141,9 @@ __HAL_DMA_DISABLE_IT(&hdma_usart3_rx,DMA_IT_HT);
         StateMachine_OneFrameReceived();
       }
     }
+    TaskMonitor_Feed(TASK_ID_RINGBUF);
+    TaskMonitor_Feed(TASK_ID_PROTOCOL_PARSE);
+    TaskMonitor_Feed(TASK_ID_SM_RECEIVE);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -277,8 +282,8 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart,uint16_t size)
     }
   }
 }
-/* USER CODE END 4 */
 
+/* USER CODE END 4 */
 /**
   * @brief  This function is executed in case of error occurrence.
   * @retval None

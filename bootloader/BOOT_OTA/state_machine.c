@@ -175,6 +175,8 @@ __asm volatile (
         if(calc_crc!=sm_ctx.expected_crc){
             printf("[SM]Verify Failed:CRC Mismatch(Expected:0x%08X,Got:0x%08X)\r\n",
             sm_ctx.expected_crc,calc_crc);
+            sm_ctx.total_received=0;
+            Flash_EraseSector(sm_ctx.write_addr);
             Sm_ChangeState(SM_STATE_RECEIVING);
             break;
         }

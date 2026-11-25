@@ -82,7 +82,7 @@
           </BeforeMake>
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
-            <RunUserProg2>0</RunUserProg2>
+            <RunUserProg2>1</RunUserProg2>
             <UserProg1Name>fromelf --bin --output=./firmware/app/app_a.bin ./Objects/app_a.axf</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
@@ -341,7 +341,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F407xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;..\..\falsh_parttion;..\..\hardfault_capture</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;../../falsh_parttion;../../hardfault_capture;../IWDG_APP</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -498,12 +498,12 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>flash_partition</GroupName>
+          <GroupName>FlashPartition</GroupName>
           <Files>
             <File>
               <FileName>flash_partition.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\..\falsh_parttion\flash_partition.h</FilePath>
+              <FilePath>..\..\falsh_parttion\flash_partition.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -519,6 +519,21 @@
               <FileName>hardfault_capture.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\hardfault_capture\hardfault_capture.h</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>IWDG</GroupName>
+          <Files>
+            <File>
+              <FileName>iwdg_app.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\IWDG_APP\iwdg_app.c</FilePath>
+            </File>
+            <File>
+              <FileName>iwdg_app.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\IWDG_APP\iwdg_app.h</FilePath>
             </File>
           </Files>
         </Group>
