@@ -51,9 +51,9 @@ DMA_HandleTypeDef hdma_usart3_rx;
 DMA_HandleTypeDef hdma_usart3_tx;
 
 /* USER CODE BEGIN PV */
-uint8_t rx_buffer[256];
+uint8_t rx_buffer[1200];
 Ring_Buffer_ts uart_tp;
-uint8_t parse_buffer[128];
+uint8_t parse_buffer[1200];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -128,17 +128,33 @@ __HAL_DMA_DISABLE_IT(&hdma_usart3_rx,DMA_IT_HT);
     StateMachine_Run();
     TaskMonitor_Feed(TASK_ID_SM_RUN);
 
-    uint32_t avail=RingBuffer_Available(&uart_tp);
-    if(avail>0)
+    for(;;)
     {
+      uint32_t avail=RingBuffer_Available(&uart_tp);
+      if(avail==0)
+      {
+        break;
+      }
+
       uint32_t to_read=(avail>sizeof(parse_buffer))?sizeof(parse_buffer):avail;
       uint32_t read_len=RingBuffer_Read(&uart_tp,parse_buffer,to_read);
-      OTA_Protocol_Parse(parse_buffer,read_len);
+
+      ota_rx_flag=0;
+      uint16_t used=OTA_Protocol_Parse(parse_buffer,(uint16_t)read_len);
 
       if(ota_rx_flag)
       {
         ota_rx_flag=0;
         StateMachine_OneFrameReceived();
+      }
+
+      if(used<read_len)
+      {
+        uart_tp.rd-=(read_len-used);
+        if(used==0)
+        {
+          break;
+        }
       }
     }
     TaskMonitor_Feed(TASK_ID_RINGBUF);
@@ -276,10 +292,25 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart,uint16_t size)
 {
   if(huart->Instance==USART3)
   {
-    if(!RingBuffer_Write(&uart_tp,rx_buffer,size))
+    if(size>0)
     {
-      printf("Write to Buffer Error\r\n");
+      if(!RingBuffer_Write(&uart_tp,rx_buffer,size))
+      {
+        printf("Write to Buffer Error\r\n");
+      }
     }
+    HAL_UARTEx_ReceiveToIdle_DMA(&huart3,rx_buffer,sizeof(rx_buffer));
+    __HAL_DMA_DISABLE_IT(&hdma_usart3_rx,DMA_IT_HT);
+  }
+}
+
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+  if(huart->Instance==USART3)
+  {
+    huart->RxState=HAL_UART_STATE_READY;
+    HAL_UARTEx_ReceiveToIdle_DMA(&huart3,rx_buffer,sizeof(rx_buffer));
+    __HAL_DMA_DISABLE_IT(&hdma_usart3_rx,DMA_IT_HT);
   }
 }
 

@@ -24,7 +24,7 @@ typedef struct __attribute__((packed))
 extern volatile uint8_t ota_rx_flag;
 extern OTA_Packet_ts ota_packet;
 
-void OTA_Protocol_Parse(uint8_t *buf,uint16_t size);
+uint16_t OTA_Protocol_Parse(uint8_t *buf,uint16_t size);
 void OTA_Protocol_SendAck(uint16_t seq,uint8_t status);
 
 #endif

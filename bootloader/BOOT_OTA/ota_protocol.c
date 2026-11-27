@@ -16,20 +16,19 @@ static RXstate_te rx_state=RX_WAIT_H0;
 static uint16_t rx_idx=0;
 static uint32_t pack_crc_calc=0;
 static uint8_t crc_buf[4];
-uint8_t crc_idx=0;
+static uint8_t crc_idx=0;
 
 static uint32_t protocol_CRC32_clac(uint32_t crc,uint8_t data)
 {
-        crc^=data;
-        for(int a=0;a<8;a++)
-        {
-            crc=(crc>>1)^(0xEDB88320&(-(crc&1)));
-        }
-    
+    crc^=data;
+    for(int a=0;a<8;a++)
+    {
+        crc=(crc>>1)^(0xEDB88320&(-(crc&1)));
+    }
     return crc;
 }
 
-void OTA_Protocol_Parse(uint8_t *buf,uint16_t size)
+uint16_t OTA_Protocol_Parse(uint8_t *buf,uint16_t size)
 {
     for(uint16_t i=0;i<size;i++)
     {
@@ -41,12 +40,15 @@ void OTA_Protocol_Parse(uint8_t *buf,uint16_t size)
             break;
 
             case RX_WAIT_H1:
-            if(byte==OTA_HEADER_1){rx_state=RX_WAIT_CMD;
-            pack_crc_calc=0xFFFFFFFF;
+            if(byte==OTA_HEADER_1)
+            {
+                rx_state=RX_WAIT_CMD;
+                pack_crc_calc=0xFFFFFFFF;
             }else if(byte==OTA_HEADER_0)
             {
                 rx_state=RX_WAIT_H1;
-            }else{
+            }else
+            {
                 rx_state=RX_WAIT_H0;
             }
             break;
@@ -65,7 +67,7 @@ void OTA_Protocol_Parse(uint8_t *buf,uint16_t size)
 
             case RX_WAIT_SEQ_L:
             ota_packet.seq|=byte;
-           pack_crc_calc=protocol_CRC32_clac(pack_crc_calc,byte);
+            pack_crc_calc=protocol_CRC32_clac(pack_crc_calc,byte);
             rx_state=RX_WAIT_LEN_H;
             break;
 
@@ -78,8 +80,9 @@ void OTA_Protocol_Parse(uint8_t *buf,uint16_t size)
             case RX_WAIT_LEN_L:
             ota_packet.len|=byte;
             pack_crc_calc=protocol_CRC32_clac(pack_crc_calc,byte);
-            if(ota_packet.len>OTA_MAX_DATA_LEN){
-                rx_state=(byte==OTA_HEADER_0)?RX_WAIT_H1:RX_WAIT_H0;
+            if(ota_packet.len>OTA_MAX_DATA_LEN)
+            {
+                rx_state=RX_WAIT_H0;
             }else if(ota_packet.len==0)
             {
                 rx_idx=0;
@@ -93,34 +96,44 @@ void OTA_Protocol_Parse(uint8_t *buf,uint16_t size)
             break;
 
             case RX_WAIT_DATA:
-            ota_packet.data[rx_idx++]=byte;
-             pack_crc_calc=protocol_CRC32_clac(pack_crc_calc,byte);
-             if(rx_idx>=ota_packet.len)
-             {
+            if(rx_idx<OTA_MAX_DATA_LEN)
+            {
+                ota_packet.data[rx_idx]=byte;
+            }
+            rx_idx++;
+            pack_crc_calc=protocol_CRC32_clac(pack_crc_calc,byte);
+            if(rx_idx>=ota_packet.len)
+            {
                 crc_idx=0;
                 rx_state=RX_WAIT_CRC;
-             }
-             break;
+            }
+            break;
 
-             case RX_WAIT_CRC:
-             crc_buf[crc_idx++]=byte;
-             if(crc_idx>=4)
-             {
-                uint32_t recv_crc=(crc_buf[0]<<24)|(crc_buf[1]<<16)
-                |(crc_buf[2]<<8)|crc_buf[3];
-                if(recv_crc==(~pack_crc_calc))
+            case RX_WAIT_CRC:
+            crc_buf[crc_idx++]=byte;
+            if(crc_idx>=4)
+            {
+                uint32_t recv_crc=((uint32_t)crc_buf[0]<<24)|((uint32_t)crc_buf[1]<<16)|
+                ((uint32_t)crc_buf[2]<<8)|(uint32_t)crc_buf[3];
+                if(recv_crc==pack_crc_calc)
                 {
+                    rx_state=RX_WAIT_H0;
                     ota_rx_flag=1;
                     OTA_Protocol_SendAck(ota_packet.seq,0);
-                }else{
+                    return (uint16_t)(i+1);
+                }
+                else
+                {
+                    rx_state=RX_WAIT_H0;
                     OTA_Protocol_SendAck(ota_packet.seq,1);
                 }
-                rx_state=(byte==OTA_HEADER_0)?RX_WAIT_H1:RX_WAIT_H0;
-             }
-             break;
+            }
+            break;
         }
     }
+    return size;
 }
+
 void OTA_Protocol_SendAck(uint16_t seq,uint8_t status)
 {
     uint8_t ack[6];

@@ -3,10 +3,11 @@
 #include "ota_protocol.h"
 #include "flash_driver.h"
 #include "flash_partition.h"
+#include "task_monitor_boot.h"
 #include <stdio.h>
 #include <string.h>
 
-extern FLASH_STATUS_TYPE FLASH_EraseSector(uint32_t sector_addr);
+extern FLASH_STATUS_TYPE Flash_EraseSector(uint32_t sector_addr);
 extern FLASH_STATUS_TYPE Flash_Write(uint32_t dest_addr,uint8_t *data,
     uint32_t len_byte,uint32_t *next_wr_addr);
 
@@ -27,6 +28,7 @@ typedef struct
         uint32_t total_received;
         uint32_t expected_size;
         uint32_t expected_crc;
+        uint8_t target_slot;
         uint16_t expect_seq;
     }Sm_Context_ts;
 
@@ -47,10 +49,13 @@ static uint32_t Calc_FlashCRC32(uint32_t start_addr,uint32_t size)
 
     while(offset<size){
         uint32_t read_size=(size-offset>256)?256:(size-offset);
-        Flash_Read(start_addr+offset,buffer,read_size);
-        for(uint32_t i=0;i<8;i++){
+        if(Flash_Read(start_addr+offset,buffer,read_size)!=FLASH_OK)
+        {
+            return 0xFFFFFFFFU;
+        }
+        for(uint32_t i=0;i<read_size;i++){
             crc^=buffer[i];
-            for(int a=0;a<read_size;a++){
+            for(int a=0;a<8;a++){
                 if(crc&1)crc=(crc>>1)^0xEDB88320;
                 else crc>>=1;
             }
@@ -146,7 +151,7 @@ __asm volatile (
 
     switch(sm_ctx.state){
         case SM_STATE_IDLE:
-        if(now-sm_ctx.timeout_tick>3000){
+        if(now-sm_ctx.timeout_tick>10000){
             uint32_t jump_addr=(sys_flag.active_slot==SLOT_A)?APP_A_BASE:APP_B_BASE;
             printf("[SM]IDLE Timeout,Jump to Active Slot %c\r\n",
             sys_flag.active_slot==SLOT_A?'A':'B');
@@ -181,7 +186,8 @@ __asm volatile (
             break;
         }
         printf("[SM]Verify Success!Updating Flag to Trial\r\n");
-        sys_flag.pending_slot=(sys_flag.active_slot==SLOT_A)?SLOT_B:SLOT_A;
+        sys_flag.active_slot=sm_ctx.target_slot;
+        sys_flag.pending_slot=sm_ctx.target_slot;
         sys_flag.fw_size=sm_ctx.total_received;
         sys_flag.fw_crc32=sm_ctx.expected_crc;
         sys_flag.try_count=0;
@@ -233,13 +239,24 @@ __asm volatile (
         }
         uint8_t target_slot=(sys_flag.active_slot==SLOT_A)?SLOT_B:SLOT_A;
         sm_ctx.write_addr=(target_slot==SLOT_A)?APP_A_BASE:APP_B_BASE;
+        sm_ctx.target_slot=target_slot;
 
         printf("[SM]START cmd received,Size:%u,Target Slot:%c\r\n",
         sm_ctx.expected_size,target_slot==SLOT_A?'A':'B');
         printf("[SM]Erasing Target Slot(Blocking ~2-4s)...\r\n");
 
+        TaskMonitor_Feed(TASK_ID_SM_RUN);
+        TaskMonitor_Feed(TASK_ID_RINGBUF);
+        TaskMonitor_Feed(TASK_ID_PROTOCOL_PARSE);
+        TaskMonitor_Feed(TASK_ID_SM_RECEIVE);
+
         Flash_EraseSector(sm_ctx.write_addr);
         Flash_EraseSector(sm_ctx.write_addr+128*1024);
+
+        TaskMonitor_Feed(TASK_ID_SM_RUN);
+        TaskMonitor_Feed(TASK_ID_RINGBUF);
+        TaskMonitor_Feed(TASK_ID_PROTOCOL_PARSE);
+        TaskMonitor_Feed(TASK_ID_SM_RECEIVE);
 
         sm_ctx.total_received=0;
         sm_ctx.expect_seq=ota_packet.seq+1;
